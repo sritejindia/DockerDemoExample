@@ -1,0 +1,35 @@
+version: "3.9"
+    
+services:
+  springservice:
+    image: spring/rest_service:v1
+    ports: 
+      - "8081:8081"
+    restart: always
+    networks: 
+      - db_network
+    depends_on: 
+      - "mysqldb"
+
+  mysqldb:
+    image: mysql
+    ports: 
+      - "3306:3306"
+    volumes:
+      - ./scripts/init-script.sql:/docker-entrypoint-initdb.d/init-script.sql
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: secret_pw
+      MYSQL_DATABASE: company
+      MYSQL_USER: spring_user
+      MYSQL_PASSWORD: spring_pw
+    networks: 
+      - db_network
+volumes:
+  db_data: {}
+
+networks: 
+  db_network: 
+    external: true
+
